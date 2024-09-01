@@ -44,6 +44,7 @@ document.addEventListener('keyup', function (e) {
 });
 
 // Touch events
+let touchControls = {};
 canvas.addEventListener('touchstart', function (e) {
     e.preventDefault();
     const touch = e.touches[0];
@@ -217,6 +218,7 @@ function displayHUD() {
 
 function showGameOver() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground();  // Ensure background is drawn
     ctx.fillStyle = 'white';
     ctx.font = '48px Arial';
     ctx.textAlign = 'center';
@@ -228,8 +230,48 @@ function showGameOver() {
     ctx.font = '24px Arial';
     ctx.fillText('Click to Restart', canvas.width / 2, canvas.height / 2 + 50);
 
+    // Load and display Google Ads on the sides of the screen
+    loadGoogleAds();
+
     // Restart Game on Click
     canvas.addEventListener('click', restartGame, { once: true });
+}
+
+function loadGoogleAds() {
+    // Ensure the ads are displayed only on the restart screen
+    const leftAd = document.createElement('div');
+    const rightAd = document.createElement('div');
+
+    leftAd.style.position = 'absolute';
+    leftAd.style.left = '0';
+    leftAd.style.top = '50%';
+    leftAd.style.transform = 'translateY(-50%)';
+    leftAd.style.width = '160px';
+    leftAd.style.height = '600px';
+    leftAd.innerHTML = `
+        <ins class="adsbygoogle"
+            style="display:block;width:160px;height:600px"
+            data-ad-client="ca-pub-5719871723860615"
+            data-ad-slot="XXXXXXX"></ins>`;
+    
+    rightAd.style.position = 'absolute';
+    rightAd.style.right = '0';
+    rightAd.style.top = '50%';
+    rightAd.style.transform = 'translateY(-50%)';
+    rightAd.style.width = '160px';
+    rightAd.style.height = '600px';
+    rightAd.innerHTML = `
+        <ins class="adsbygoogle"
+            style="display:block;width:160px;height:600px"
+            data-ad-client="ca-pub-5719871723860615"
+            data-ad-slot="XXXXXXX"></ins>`;
+
+    document.body.appendChild(leftAd);
+    document.body.appendChild(rightAd);
+
+    // Initialize the ads
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
 }
 
 function restartGame() {
@@ -243,6 +285,13 @@ function restartGame() {
     lives = 3;  // Reset lives
     score = 0;  // Reset score
     isGameOver = false;
+
+    // Remove any existing click event listeners before restarting
+    canvas.removeEventListener('click', restartGame);
+
+    // Remove Google Ads from the DOM
+    document.querySelectorAll('ins.adsbygoogle').forEach(ad => ad.remove());
+
     gameLoop();  // Restart the game loop
 }
 
