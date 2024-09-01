@@ -23,23 +23,68 @@ let isGameOver = false;
 let lives = 3;  // Initialize with 3 lives
 let score = 0;  // Initialize score
 
-// Keypress events
+// Control settings
+const controls = {
+    up: ['ArrowUp', 'W'],
+    down: ['ArrowDown', 'S'],
+    left: ['ArrowLeft', 'A'],
+    right: ['ArrowRight', 'D'],
+    shoot: [' ']
+};
+
 let keys = {};
 
+// Keypress events
 document.addEventListener('keydown', function (e) {
-    if (!isGameOver) {
-        keys[e.key] = true;
-    }
+    keys[e.key] = true;
 });
 
 document.addEventListener('keyup', function (e) {
     keys[e.key] = false;
 });
 
+// Touch events
+canvas.addEventListener('touchstart', function (e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    touchControls.x = touch.clientX;
+    touchControls.y = touch.clientY;
+});
+
+canvas.addEventListener('touchend', function (e) {
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    if (touchControls.x && touchControls.y) {
+        const dx = touch.clientX - touchControls.x;
+        const dy = touch.clientY - touchControls.y;
+        
+        if (Math.abs(dx) > Math.abs(dy)) {
+            // Horizontal swipe
+            if (dx > 0) {
+                keys['ArrowRight'] = true;
+                setTimeout(() => keys['ArrowRight'] = false, 200);
+            } else {
+                keys['ArrowLeft'] = true;
+                setTimeout(() => keys['ArrowLeft'] = false, 200);
+            }
+        } else {
+            // Vertical swipe
+            if (dy > 0) {
+                keys['ArrowDown'] = true;
+                setTimeout(() => keys['ArrowDown'] = false, 200);
+            } else {
+                keys['ArrowUp'] = true;
+                setTimeout(() => keys['ArrowUp'] = false, 200);
+            }
+        }
+    }
+});
+
 // Game loop
 function gameLoop() {
     if (!isGameOver) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
         drawShip();
         moveShip();
         handleBullets();
@@ -52,25 +97,31 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+function drawBackground() {
+    ctx.fillStyle = 'black';  // Set background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
 function drawShip() {
     ctx.fillStyle = 'white';
     ctx.fillRect(shipX, shipY, shipWidth, shipHeight);
 }
 
 function moveShip() {
-    if (keys['ArrowLeft'] && shipX > 0) {
+    // Handle ship movement with correct speed and key mappings
+    if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
         shipX -= lateralSpeed;
     }
-    if (keys['ArrowRight'] && shipX < canvas.width - shipWidth) {
+    if (keys['ArrowRight'] || keys['d'] || keys['D']) {
         shipX += lateralSpeed;
     }
-    if (keys['ArrowUp'] && shipY > 0) {
+    if (keys['ArrowUp'] || keys['w'] || keys['W']) {
         shipY -= shipSpeed;
     }
-    if (keys['ArrowDown'] && shipY < canvas.height - shipHeight) {
+    if (keys['ArrowDown'] || keys['s'] || keys['S']) {
         shipY += shipSpeed;
     }
-    if (keys[' ']) {
+    if (keys[' '] || keys['Space']) {
         shootBullet();
     }
 }
