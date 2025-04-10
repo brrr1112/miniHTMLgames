@@ -99,7 +99,7 @@ function gameLoop() {
 }
 
 function drawBackground() {
-    ctx.fillStyle = 'black';  // Set background color
+    ctx.fillStyle = 'white';  // Set background color
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
